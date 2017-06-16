@@ -1,0 +1,24 @@
+{
+  "name": "ivcalcgobotapi",
+  "version": "0.0.1",
+  "description": "Bot API for IV calculations for Pokemon Go",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "bot",
+    "api",
+    "telegram",
+    "discord",
+    "REST",
+    "pokemon",
+    "pokemon",
+    "go"
+  ],
+  "author": "Mathias Rodriguez",
+  "license": "MIT",
+  "dependencies": {
+    "node-telegram-bot-api": "^0.27.1"
+  }
+}
