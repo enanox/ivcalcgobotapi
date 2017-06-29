@@ -40,11 +40,24 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
     message_id: msg.message_id,
   };
   
-  
-  if (action.action === "teamSelection") {
-    new IVCalculatorCtrl().processTeamSelectionAnswer(bot, callbackQuery);
+  switch(action.action) {
+    case "teamSelection":
+      new IVCalculatorCtrl().processTeamSelectionAnswer(bot, callbackQuery);
+      break;
+    case "overallAppraisal":
+      new IVCalculatorCtrl().processOverallAppraisalAnswer(bot, callbackQuery);
+      break;
+    case "statCalculation":
+      new IVCalculatorCtrl().processStatAnswer(bot, callbackQuery);
+      break;
+    case "individualAppraisal":
+      new IVCalculatorCtrl().processIndividualAppraisalAnswer(bot, callbackQuery);
+      break;
   }
 });
+
+bot.onText(messageRegex.start, (msg, match) => new BareMessageCtrl().startResponseListener(bot, msg));
+bot.onText(messageRegex.support, (msg, match) => new BareMessageCtrl().supportResponseListener(bot, msg));
 
 // Listen for any kind of message. There are different kinds of
 // messages.
