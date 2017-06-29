@@ -3,22 +3,44 @@ const esLang = require("../lang/es");
 class LocalizationHelper {
     static translate(messageKey, parameterList) {
         if (messageKey && messageKey.includes(".")) {
-            let localizedText = LocalizationHelper.deepValue(messageKey, esLang);            
-            let totalPlaceholders = localizedText.match(/%(\d)+/g);
+            let localizedText = LocalizationHelper.deepValue(messageKey, esLang);
+            
+            let totalPlaceholders;
+            
+            if (localizedText instanceof Array) {
+                for (let text of localizedText) {
+                    let count = text.match(/%(\d)+/g);
+                    
+                    if (!totalPlaceholders || (count && totalPlaceholders && count.length > totalPlaceholders.length)) {
+                        totalPlaceholders = count;
+                    }
+                }
+            } else {
+                totalPlaceholders = localizedText.match(/%(\d)+/g);
+            }
+
             let replacements;
             
-            for (let i = 0; i < totalPlaceholders.length; i++) {
-                let parameter = parameterList[i];
-                
-                if (!replacements) {
-                    replacements = localizedText;
-                }
+            if (totalPlaceholders && parameterList) {
+                for (let i = 0; i < totalPlaceholders.length; i++) {
+                    let parameter = parameterList[i];
+                    
+                    if (!replacements) {
+                        replacements = localizedText;
+                    }
 
-                if (!parameter) {
-                    parameter = LocalizationHelper.deepValue("fallback." + messageKey, esLang);
-                }
+                    if (!parameter) {
+                        parameter = LocalizationHelper.deepValue("fallback." + messageKey, esLang);
+                    }
 
-                replacements = replacements.replace(`%${i}`, parameter);
+                    if (localizedText instanceof Array) {
+                        for (let j = 0; j < localizedText.length; j++) {
+                            localizedText[j] = localizedText[j].replace(`%${i}`, parameter);
+                        }
+                    } else {
+                        replacements = replacements.replace(`%${i}`, parameter);
+                    }
+                }
             }
 
             if (!replacements) {
