@@ -5,5 +5,6 @@ module.exports = {
         teams: /Instinct|Valor|Mystic/,
         start: /\/start/,
         support: /\/support/
-    }
+    },
+    debug: false
 };

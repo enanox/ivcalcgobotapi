@@ -11,11 +11,21 @@ module.exports = {
         }, {
             id: 4,
             response: "¡Nobody could expect the Spanish Inquisition!"
-        }]            
-    }, 
+        }],
+        welcome: `Hi %0, welcome to <b>IVCalcGoBot</b>. 
+This bot is currently under development. Feel free to contribute or report issues on https://github.com/enanox/ivcalcgobotapi.
+
+The current commands are:
+/echo message - Repeats message
+/iv Abra cp:790 hp:47 s:3500 c:3 - Calculates IVs for the input Pokémon.
+
+Author: @enanox
+`,
+        support: `Please, for the correct validation of the appraisal output copy the input command, the answer message and send me those to @enanox, along with the Pokémon screencap to verify. 
+Thanks in advance!`
+    },
     ivCalculator: {
-        beautifiedOutput: `Your %0 without appraisal with 
-[CP: %1] [HP: %2] [Stardust: %3] [Candy: %4]
+        beautifiedOutput: `Checking your *%0* appraisal.
 
 Select your team`,
         statCalculation: ["ATK", "DEF", "STA", "ATK/DEF", "ATK/STA", "DEF/STA", "ATK/DEF/STA"],
@@ -23,16 +33,16 @@ Select your team`,
         leaderAppraisal: {
             i: {
                 overall: [
-                    "Overall, your %0 looks like it can really battle with the best of them!",
-                    "Overall, your %0 is really strong!",
-                    "Overall, your %0 is pretty decent!",
-                    "Overall, your %0 has room for improvement as far as battling goes"
+                    "Overall, your *%0* looks like it can really battle with the best of them!",
+                    "Overall, your *%0* is really strong!",
+                    "Overall, your *%0* is pretty decent!",
+                    "Overall, your *%0* has room for improvement as far as battling goes"
                 ],
                 overallShort: [
-                    "Looks like it can really battle with the best of them!",
+                    "It can really battle with the best of them!",
                     "It's really strong!",
                     "It's pretty decent!",
-                    "Has room for improvement as far as battling goes"
+                    "Has room for improvement"
                 ],
                 individual: [
                     "Its stats are the best I’ve ever seen! No doubt about it!",
@@ -61,10 +71,10 @@ Select your team`,
             },
             m: {
                 overall: [
-                    "Overall, your %0 is a wonder! What a breathtaking Pokemon!",
-                    "Overall, your %0 has certainly caught my attention",
-                    "Overall, your %0 is above average",
-                    "Overall, your %0 is not likely to make much headway in battle"
+                    "Overall, your *%0* is a wonder! What a breathtaking Pokemon!",
+                    "Overall, your *%0* has certainly caught my attention",
+                    "Overall, your *%0* is above average",
+                    "Overall, your *%0* is not likely to make much headway in battle"
                 ],
                 overallShort: [
                     "It's a wonder!",
@@ -99,10 +109,10 @@ Select your team`,
             },
             v: {
                 overall: [
-                    "Overall, your %0 simply amazes me. It can accomplish anything!",
-                    "Overall, your %0 is a strong Pokemon. You should be proud!",
-                    "Overall, your %0 is a decent Pokemon",
-                    "Overall, your %0 may not be great in battle, but I still like it!"
+                    "Overall, your *%0* simply amazes me. It can accomplish anything!",
+                    "Overall, your *%0* is a strong Pokemon. You should be proud!",
+                    "Overall, your *%0* is a decent Pokemon",
+                    "Overall, your *%0* may not be great in battle, but I still like it!"
                 ],
                 overallShort: [
                     "It simply amazes me",
@@ -141,7 +151,7 @@ Select your team`,
         statPrompt: "Select the best stat:",
         result: `The results for your *%0*
 IVs: *%1*
-Stats: %2/%3/%4`
+Stats: *%2* / *%3* / *%4*`
     },
     fallback: {
         ivCalculator: {

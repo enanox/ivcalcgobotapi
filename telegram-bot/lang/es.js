@@ -18,11 +18,11 @@ navega a https://github.com/enanox/ivcalcgobotapi.
 
 Los comandos actuales son:
 /echo mensaje - Repite el mensaje
-/iv Abra cp: 790 hp: 47 s: 3500 c: 3 - Calcula los IVs para el Pokémon con los parámetros indicados.
+/iv Abra cp:790 hp:47 s:3500 c:3 - Calcula los IVs para el Pokémon con los parámetros indicados.
 
 Autor: @enanox
 `,
-    support: `Por favor, para validar que los cálculos sean correctos copia el comando de entrada y el mensaje y
+        support: `Por favor, para validar que los cálculos sean correctos copia el comando de entrada y el mensaje y
 envíamelos a @enanox, junto con una captura de pantalla del Pokémon para verificar. 
 ¡Muchas gracias!`
     }, 
@@ -126,7 +126,7 @@ envíamelos a @enanox, junto con una captura de pantalla del Pokémon para verif
         statPrompt: "Selecciona la mejor característica:",
         result: `Los resultados para tu *%0*
 IVs: *%1*
-Características: *%2*/*%3*/*%4*`
+Características: *%2* / *%3* / *%4*`
     },
     fallback: {
         ivCalculator: {

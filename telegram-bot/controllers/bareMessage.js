@@ -17,34 +17,35 @@ class BareMessageCtrl {
         // send a message to the chat acknowledging receipt of their message
         
         if (!msg.text.match(messageRegex.echo) && !msg.text.match(messageRegex.iv) && !msg.text.match(messageRegex.start) && !msg.text.match(messageRegex.support))  {
-            this.process(chatId, msg.text);
+            this.process(chatId, msg);
         }
     }
 
     process(chatId, msg) {
-        let message = msg;
+        let message = msg.text;
+        let language_code = LocalizationHelper.parseLanguageCode(msg.from.language_code);
         let curseWordResponse = curseWords.find((word) => {            
             if (word.match && word.match instanceof Array) {
                 for (let match of word.match) {
-                    if (msg.includes(match)) {
+                    if (message && message.includes(match)) {
                         return true;
                     }
                 }
             } else {
-                if (msg.includes(word.match)) {
+                if (message.includes(word.match)) {
                     return true;
                 }
             }
         });
-        
+
         if (curseWordResponse) {
             message = curseWordResponse.response;
         } else {
-            message = LocalizationHelper.translate("bareMessage.received");
+            message = LocalizationHelper.translate("bareMessage.received", language_code);
         }
-        
-        if (msg.startsWith("/") && !msg.includes("/echo") && !msg.includes("/start") && !msg.includes("/support")) {
-            message = LocalizationHelper.translate("bareMessage.wrong");
+
+        if (message.startsWith("/") && !message.includes("/echo") && !message.includes("/start") && !message.includes("/support")) {
+            message = LocalizationHelper.translate("bareMessage.wrong", language_code);
         }
         
         this.bot.sendMessage(chatId, message);
@@ -54,12 +55,11 @@ class BareMessageCtrl {
         if (!this.bot) {
             this.bot = bot;
         }
-        
+        let language_code = LocalizationHelper.parseLanguageCode(msg.from.language_code);
         const chatId = msg.chat.id;
         const fromUser = `${msg.from.first_name || "@" + msg.from.username}`;
-        
-        // send a message to the chat acknowledging receipt of their message
-        const welcomeMessage = LocalizationHelper.translate("bareMessage.welcome", [fromUser]);
+        const welcomeMessage = LocalizationHelper.translate("bareMessage.welcome", language_code, [fromUser]);
+
         this.bot.sendMessage(chatId, welcomeMessage, {parse_mode: "HTML"});
     }
 
@@ -67,11 +67,10 @@ class BareMessageCtrl {
         if (!this.bot) {
             this.bot = bot;
         }
-        
+        let language_code = LocalizationHelper.parseLanguageCode(msg.from.language_code);
         const chatId = msg.chat.id;
+        const supportMessage = LocalizationHelper.translate("bareMessage.support", language_code);
 
-        // send a message to the chat acknowledging receipt of their message
-        const supportMessage = LocalizationHelper.translate("bareMessage.support");
         this.bot.sendMessage(chatId, supportMessage);
     }
 }

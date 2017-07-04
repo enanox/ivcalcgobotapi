@@ -1,9 +1,31 @@
 const esLang = require("../lang/es");
+const enLang = require("../lang/en");
+const debug = require("../config").debug;
 
 class LocalizationHelper {
-    static translate(messageKey, parameterList) {
+    static parseLanguageCode(language_code) {
+        if (language_code.includes("-")) {
+            language_code = language_code.split("-")[0];
+        }
+
+        return language_code;
+    }
+
+    static translate(messageKey, currentLang, parameterList) {
+        let langFile;
+
+        if (currentLang) {
+            langFile = require("../lang/" + currentLang);
+        } else {
+            langFile = esLang;
+        }
+
+        if (debug) {
+            console.log(`Translating ${ messageKey } in ${ currentLang }. Parameters: ${ parameterList }`);
+        }
+
         if (messageKey && messageKey.includes(".")) {
-            let localizedText = LocalizationHelper.deepValue(messageKey, esLang);
+            let localizedText = LocalizationHelper.deepValue(messageKey, langFile);
             
             let totalPlaceholders;
             
@@ -30,7 +52,7 @@ class LocalizationHelper {
                     }
 
                     if (!parameter) {
-                        parameter = LocalizationHelper.deepValue("fallback." + messageKey, esLang);
+                        parameter = LocalizationHelper.deepValue("fallback." + messageKey, langFile);
                     }
 
                     if (localizedText instanceof Array) {
@@ -59,7 +81,7 @@ class LocalizationHelper {
         };
 
         return obj;
-    };
+    }
 }
 
 module.exports = LocalizationHelper;
