@@ -30,9 +30,18 @@ class Stats {
         let restPosition = clientStore.individual === 3 && 3 || clientStore.individual + 1;
 
         if (clientStore.stat === 6) {
-            statIVs.atk = Number.parseInt(dependingOnStops);
-            statIVs.def = Number.parseInt(dependingOnStops);
-            statIVs.sta = Number.parseInt(dependingOnStops);
+            let threshold;
+            
+            if (clientStore.overall > clientStore.individual) {
+                const stopArray = individualStops[clientStore.overall].split("-");
+                threshold = stopArray[stopArray.length - 1];
+            } else {
+                threshold = individualStops[clientStore.individual];
+            }
+
+            statIVs.atk = Number.parseInt(threshold);
+            statIVs.def = Number.parseInt(threshold);
+            statIVs.sta = Number.parseInt(threshold);
         } else if ([3, 4, 5].lastIndexOf(clientStore.stat) !== -1) {
 
             if (clientStore.stat === 3) {
@@ -61,7 +70,7 @@ class Stats {
             statIVs.def = individualStops[restPosition];
             statIVs.sta = individualStops[restPosition];
         }
-
+        
         return {
             mon: clientStore.input.mon,
             IVs: {
