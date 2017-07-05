@@ -1,5 +1,5 @@
 const fs = require("fs"),
-      path = require("path");
+  path = require("path");
 const TelegramBot = require('node-telegram-bot-api');
 const config = require("./config");
 const messageRegex = config.messageRegex;
@@ -9,27 +9,27 @@ const IVCalculatorCtrl = require("./controllers/ivCalculator");
 let token = process.env.IVCalcGoBotToken;
 
 if (!token) {
-    try {
-        token = fs.readFileSync(path.resolve("./telegram-bot/config/token"));
-    } catch (e) {
-        throw "Missing token file. Load the IVCalcGoBotToken environment variable or add a file text.";
-    }
+  try {
+    token = fs.readFileSync(path.resolve("./telegram-bot/config/token")).toString();
+  } catch (e) {
+    throw "Missing token file. Load the IVCalcGoBotToken environment variable or add a file text.";
+  }
 }
 
 let appMetricaToken = process.env.IVCalcGoBotTokenAppMetrica;
 
 if (!appMetricaToken) {
-    try {
-        appMetricaToken = fs.readFileSync(path.resolve("./telegram-bot/config/tokenAppMetrica"));
-    } catch (e) {
-        throw "Missing AppMetrica token file. Load the IVCalcGoBotTokenAppMetrica environment variable or add a file text.";
-    }
+  try {
+    appMetricaToken = fs.readFileSync(path.resolve("./telegram-bot/config/tokenAppMetrica"));
+  } catch (e) {
+    throw "Missing AppMetrica token file. Load the IVCalcGoBotTokenAppMetrica environment variable or add a file text.";
+  }
 }
 
 const botan = require("botanio")(appMetricaToken);
 
 // Create a bot that uses 'polling' to fetch new updates
-const bot = new TelegramBot(token, {polling: true});
+const bot = new TelegramBot(token, { polling: true });
 
 // Matches "/echo [whatever]"
 bot.onText(messageRegex.echo, (msg, match) => {
@@ -51,8 +51,8 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
     chat_id: msg.chat.id,
     message_id: msg.message_id,
   };
-  
-  switch(action.action) {
+
+  switch (action.action) {
     case "teamSelection":
       new IVCalculatorCtrl().processTeamSelectionAnswer(bot, callbackQuery);
       break;
