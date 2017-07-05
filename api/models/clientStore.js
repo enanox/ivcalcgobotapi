@@ -1,5 +1,6 @@
 class ClientStore {
-    constructor(input, team, overall, stat, individual, size) {
+    constructor(chat_id, input, team, overall, stat, individual, size) {
+        this.chat_id = chat_id;
         this.input = input;
         this.team = team;
         this.overall = overall;
