@@ -1,6 +1,6 @@
 {
   "name": "ivcalcgobotapi",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Bot API for IV calculations for Pokemon Go",
   "main": "index.js",
   "scripts": {
@@ -19,6 +19,7 @@
   "author": "Mathias Rodriguez",
   "license": "MIT",
   "dependencies": {
+    "botanio": "0.0.6",
     "node-telegram-bot-api": "^0.27.1"
   }
 }

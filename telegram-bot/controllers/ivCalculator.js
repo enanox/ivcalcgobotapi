@@ -42,7 +42,7 @@ function clearStore(storeIndex) {
 }
 
 class IVCalculatorCtrl {        
-    responseListener(bot, msg, match) {
+    responseListener(bot, botan, msg, match) {
         if (!this.bot) {
             this.bot = bot;
         }
@@ -63,6 +63,7 @@ class IVCalculatorCtrl {
         
         const opts = this.askForTeam(msg);
         debugStore();
+        botan.track(msg, "/iv");
         bot.sendMessage(chatId, formatted, opts);
     }
 

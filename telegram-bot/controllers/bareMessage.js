@@ -7,7 +7,7 @@ class BareMessageCtrl {
         this.bot = bot;
     }
 
-    responseListener(bot, msg) {
+    responseListener(bot, botan, msg) {
         if (!this.bot) {
             this.bot = bot;
         }
@@ -17,11 +17,11 @@ class BareMessageCtrl {
         // send a message to the chat acknowledging receipt of their message
         
         if (!msg.text.match(messageRegex.echo) && !msg.text.match(messageRegex.iv) && !msg.text.match(messageRegex.start) && !msg.text.match(messageRegex.support))  {
-            this.process(chatId, msg);
+            this.process(botan, chatId, msg);
         }
     }
 
-    process(chatId, msg) {
+    process(botan, chatId, msg) {
         let message = msg.text;
         let language_code = LocalizationHelper.parseLanguageCode(msg.from.language_code);
         let curseWordResponse = curseWords.find((word) => {            
@@ -48,10 +48,11 @@ class BareMessageCtrl {
             message = LocalizationHelper.translate("bareMessage.wrong", language_code);
         }
         
+        botan.track(msg, "any");
         this.bot.sendMessage(chatId, message);
     }
 
-    startResponseListener(bot, msg) {
+    startResponseListener(bot, botan, msg) {
         if (!this.bot) {
             this.bot = bot;
         }
@@ -59,11 +60,12 @@ class BareMessageCtrl {
         const chatId = msg.chat.id;
         const fromUser = `${msg.from.first_name || "@" + msg.from.username}`;
         const welcomeMessage = LocalizationHelper.translate("bareMessage.welcome", language_code, [fromUser]);
-
+        
+        botan.track(msg, "/start");
         this.bot.sendMessage(chatId, welcomeMessage, {parse_mode: "HTML"});
     }
 
-    supportResponseListener(bot, msg) {
+    supportResponseListener(bot, botan, msg) {
         if (!this.bot) {
             this.bot = bot;
         }
@@ -71,6 +73,7 @@ class BareMessageCtrl {
         const chatId = msg.chat.id;
         const supportMessage = LocalizationHelper.translate("bareMessage.support", language_code);
 
+        botan.track(msg, "/support");
         this.bot.sendMessage(chatId, supportMessage);
     }
 }

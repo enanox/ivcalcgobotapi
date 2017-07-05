@@ -6,7 +6,6 @@ const messageRegex = config.messageRegex;
 const BareMessageCtrl = require("./controllers/bareMessage");
 const IVCalculatorCtrl = require("./controllers/ivCalculator");
 
-// replace the value below with the Telegram token you receive from @BotFather
 let token = process.env.IVCalcGoBotToken;
 
 if (!token) {
@@ -17,6 +16,18 @@ if (!token) {
     }
 }
 
+let appMetricaToken = process.env.IVCalcGoBotTokenAppMetrica;
+
+if (!appMetricaToken) {
+    try {
+        appMetricaToken = fs.readFileSync(path.resolve("./telegram-bot/config/tokenAppMetrica"));
+    } catch (e) {
+        throw "Missing AppMetrica token file. Load the IVCalcGoBotTokenAppMetrica environment variable or add a file text.";
+    }
+}
+
+const botan = require("botanio")(appMetricaToken);
+
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(token, {polling: true});
 
@@ -25,12 +36,13 @@ bot.onText(messageRegex.echo, (msg, match) => {
   const chatId = msg.chat.id;
   const resp = match[1];
 
+  botan.track(msg, "/echo");
   bot.sendMessage(chatId, resp);
 });
 
 // Matches "/iv <name> [cp:]<number> [hp:]<number> [s:]<number> [c:]<number>"
 // [optional]
-bot.onText(messageRegex.iv, (msg, match) => new IVCalculatorCtrl().responseListener(bot, msg, match));
+bot.onText(messageRegex.iv, (msg, match) => new IVCalculatorCtrl().responseListener(bot, botan, msg, match));
 
 bot.on('callback_query', function onCallbackQuery(callbackQuery) {
   const action = JSON.parse(callbackQuery.data);
@@ -56,9 +68,9 @@ bot.on('callback_query', function onCallbackQuery(callbackQuery) {
   }
 });
 
-bot.onText(messageRegex.start, (msg, match) => new BareMessageCtrl().startResponseListener(bot, msg));
-bot.onText(messageRegex.support, (msg, match) => new BareMessageCtrl().supportResponseListener(bot, msg));
+bot.onText(messageRegex.start, (msg, match) => new BareMessageCtrl().startResponseListener(bot, botan, msg));
+bot.onText(messageRegex.support, (msg, match) => new BareMessageCtrl().supportResponseListener(bot, botan, msg));
 
 // Listen for any kind of message. There are different kinds of
 // messages.
-bot.on('message', (msg) => new BareMessageCtrl().responseListener(bot, msg));
+bot.on('message', (msg) => new BareMessageCtrl().responseListener(bot, botan, msg));
