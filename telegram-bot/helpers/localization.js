@@ -50,8 +50,8 @@ class LocalizationHelper {
                     if (!replacements) {
                         replacements = localizedText;
                     }
-
-                    if (!parameter) {
+                    
+                    if (parameter === null || parameter === undefined) {
                         parameter = LocalizationHelper.deepValue("fallback." + messageKey, langFile);
                     }
 
