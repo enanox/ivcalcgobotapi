@@ -1,4 +1,5 @@
 const ClientStore = require("../models/clientStore");
+const debug = require("../config").debug;
 
 class Stats {
     static validate(clientStore) {
@@ -10,7 +11,7 @@ class Stats {
             throw "Missing input data";
         }
 
-        this.stored = new ClientStore(clientStore.input, clientStore.team, clientStore.overall, clientStore.stat, clientStore.individual, clientStore.size)
+        this.stored = new ClientStore(clientStore.chat_id, clientStore.input, clientStore.team, clientStore.overall, clientStore.stat, clientStore.individual, clientStore.size)
     }
 
     static calculate(clientStore) {
