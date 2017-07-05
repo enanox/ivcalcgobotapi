@@ -32,6 +32,7 @@ Note: so far, the MVP is not available yet.
     - [ ] Appraisal
         - [x] From Team Leader appraisal
         - [ ] Using straight formula based on input data
+    - [x] Add analytics tracking from AppMetrica (Yandex)
 - Discord bot:
     - [ ] Create bot
     - [ ] Appraisal
