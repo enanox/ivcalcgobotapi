@@ -151,7 +151,14 @@ Select your team`,
         statPrompt: "Select the best stat:",
         result: `The results for your *%0*
 IVs: *%1*
-Stats: *%2* / *%3* / *%4*`
+Stats: *%2* / *%3* / *%4*`,
+        noNameMatches: "No name matches with *%0*",
+        someNameMatches: `No name matches with *%0*
+Alternatives you could try:
+%1
+%2
+%3
+`
     },
     fallback: {
         ivCalculator: {

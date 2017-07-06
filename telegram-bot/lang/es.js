@@ -126,7 +126,14 @@ envíamelos a @enanox, junto con una captura de pantalla del Pokémon para verif
         statPrompt: "Selecciona la mejor característica:",
         result: `Los resultados para tu *%0*
 IVs: *%1*
-Características: *%2* / *%3* / *%4*`
+Características: *%2* / *%3* / *%4*`,
+        noNameMatches: "No hay ninguna coincidencia con el nombre *%0*",
+        someNameMatches: `No hay ninguna coincidencia con el nombre *%0*
+Quizás hayas intentado calcular:
+%1
+%2
+%3
+`
     },
     fallback: {
         ivCalculator: {

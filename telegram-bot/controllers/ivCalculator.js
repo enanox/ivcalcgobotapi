@@ -1,5 +1,6 @@
 const LocalizationHelper = require("../helpers/localization");
-const FrameworkStats = require("../../api/framework/stats");
+const Stats = require("../../api/framework").Stats,
+    Validation = require("../../api/framework").Validation;
 const ClientStore = require("../../api/models/clientStore");
 const debug = require("../config").debug;
 
@@ -8,7 +9,7 @@ const CP_VALUE = 4;
 const HP_VALUE = 7;
 const STARDUST_VALUE = 10;
 const CANDY_VALUE = 13;
-const TEAMS = {i: "Instinct", m: "Mystic", v: "Valor"};
+const TEAMS = { i: "Instinct", m: "Mystic", v: "Valor" };
 const TEAM_YELLOW = 0, TEAM_BLUE = 1; TEAM_RED = 2;
 
 // ToDo: add Redux store
@@ -41,7 +42,7 @@ function clearStore(storeIndex) {
     }
 }
 
-class IVCalculatorCtrl {        
+class IVCalculatorCtrl {
     responseListener(bot, botan, msg, match) {
         if (!this.bot) {
             this.bot = bot;
@@ -54,22 +55,48 @@ class IVCalculatorCtrl {
             console.log(msg);
         }
 
+        botan.track(msg, "/iv");
+
         const input = this.parseInput(match);
         Object.preventExtensions(input);
+
+        const validationResult = Validation.nameNotExists(input.mon);
         
+        if (!validationResult[0]) {
+            let message;
+            
+            if (!validationResult[1]) {
+                message = LocalizationHelper.translate("ivCalculator.noNameMatches", language_code, [input.mon]);
+            } else {
+                let alternatives = validationResult[1].map((mon) => mon.POK);
+                
+                if (alternatives.length > 0 && alternatives.length < 3) {
+                    let count = 3 - alternatives.length;
+
+                    for (let i = alternatives.length - 1; i < 3; i++) {
+                        alternatives.push("");
+                    }
+                }
+
+                message = LocalizationHelper.translate("ivCalculator.someNameMatches", language_code, [input.mon].concat(alternatives));
+            }
+
+            bot.sendMessage(chatId, message, { parse_mode: "Markdown" });
+            return;
+        }
+
         store.push(new ClientStore(chatId, input));
 
         let formatted = this.beautifyOutput(input, language_code);
-        
+
         const opts = this.askForTeam(msg);
         debugStore();
-        botan.track(msg, "/iv");
         bot.sendMessage(chatId, formatted, opts);
     }
 
     parseInput(match) {
         return {
-            mon: match[MON_NAME],
+            mon: match[MON_NAME] && `${match[MON_NAME].charAt(0).toUpperCase()}${ match[MON_NAME].substr(1).toLowerCase() }`,
             cp: match[CP_VALUE] || match[CP_VALUE - 2],
             hp: match[HP_VALUE] || match[HP_VALUE - 2],
             stardust: match[STARDUST_VALUE] || match[STARDUST_VALUE - 2],
@@ -77,7 +104,7 @@ class IVCalculatorCtrl {
         };
     }
 
-    beautifyOutput(inputData, language_code)  {
+    beautifyOutput(inputData, language_code) {
         return LocalizationHelper.translate("ivCalculator.beautifiedOutput", language_code, Object.values(inputData));
     }
 
@@ -98,7 +125,7 @@ class IVCalculatorCtrl {
                 keyboardAnswers.push([keyboardOption]);
             }
         }
-        
+
         return {
             //reply_to_message_id: msg.message_id,
             reply_markup: JSON.stringify({
@@ -131,23 +158,23 @@ class IVCalculatorCtrl {
             message_id: msg.message_id,
             parse_mode: "Markdown"
         };
-        
+
         if (debug) {
             console.log(`First message`, msg);
         }
 
         let text;
-        
+
         if (data.action === "teamSelection" && Object.keys(TEAMS).indexOf(data.value) !== -1) {
-            text = `*${ TEAMS[data.value] }*`;
+            text = `*${TEAMS[data.value]}*`;
         }
 
         const storeIndex = store.findIndex((item) => item.chat_id === msg.chat.id);
         if (storeIndex > -1) {
-            store[storeIndex].team = data.value;        
+            store[storeIndex].team = data.value;
             debugStore();
         }
-        
+
         return bot.editMessageText(text, opts).then((originalMsg) => {
             const overall = this.askLeaderOverallAppraisal(language_code, storeIndex);
             const prompt = LocalizationHelper.translate(`ivCalculator.overallAppraisalPrompt`, language_code);
@@ -159,7 +186,7 @@ class IVCalculatorCtrl {
         debugStore();
         let keyboardAnswers = [];
         let teamKey = store[storeIndex].team;
-        let teamOptions = LocalizationHelper.translate(`ivCalculator.leaderAppraisal.${ teamKey }.overallShort`, language_code, [store[storeIndex].input.mon]);
+        let teamOptions = LocalizationHelper.translate(`ivCalculator.leaderAppraisal.${teamKey}.overallShort`, language_code, [store[storeIndex].input.mon]);
 
         for (let i = 0; i < teamOptions.length; i++) {
             let position = Math.floor(i / 2);
@@ -173,9 +200,9 @@ class IVCalculatorCtrl {
                 keyboardAnswers[position].push(keyboardOption);
             } else {
                 keyboardAnswers.push([keyboardOption]);
-            }   
+            }
         }
-        
+
         return {
             //reply_to_message_id: msg.message_id,
             reply_markup: JSON.stringify({
@@ -195,11 +222,11 @@ class IVCalculatorCtrl {
         };
 
         const storeIndex = store.findIndex((item) => item.chat_id === msg.chat.id);
-        let texts = LocalizationHelper.translate(`ivCalculator.leaderAppraisal.${ store[storeIndex].team }.overall`, language_code, [store[storeIndex].input.mon]);
+        let texts = LocalizationHelper.translate(`ivCalculator.leaderAppraisal.${store[storeIndex].team}.overall`, language_code, [store[storeIndex].input.mon]);
         let text = texts[data.value];
-        
+
         if (storeIndex > -1) {
-            store[storeIndex].overall = data.value;        
+            store[storeIndex].overall = data.value;
             debugStore();
         }
 
@@ -219,7 +246,7 @@ class IVCalculatorCtrl {
         for (let i = 0; i < teamOptions.length; i++) {
             let position = Math.floor(i / 3);
             let keyboardOption = this.createKeyboardOptionSchema(teamOptions[i], this.stringifySelection("statCalculation", i));
-            
+
             if (orientationStat === "sideBySide") {
                 if (i % 3 === 0) {
                     keyboardAnswers[position] = [];
@@ -230,7 +257,7 @@ class IVCalculatorCtrl {
                 keyboardAnswers.push([keyboardOption]);
             }
         }
-        
+
         return {
             //reply_to_message_id: msg.message_id,
             reply_markup: JSON.stringify({
@@ -252,9 +279,9 @@ class IVCalculatorCtrl {
         let stat = LocalizationHelper.translate(`ivCalculator.statCalculation`, language_code)[data.value];
         let text = LocalizationHelper.translate(`ivCalculator.bestStat`, language_code, [stat]);
         const storeIndex = store.findIndex((item) => item.chat_id === msg.chat.id);
-        
+
         if (storeIndex > -1) {
-            store[storeIndex].stat = data.value;        
+            store[storeIndex].stat = data.value;
             debugStore();
         }
 
@@ -269,12 +296,12 @@ class IVCalculatorCtrl {
         debugStore();
         let keyboardAnswers = [];
         let teamKey = store[storeIndex].team;
-        let teamOptions = LocalizationHelper.translate(`ivCalculator.leaderAppraisal.${ teamKey }.individualShort`, language_code, [store[storeIndex].input.mon]);
+        let teamOptions = LocalizationHelper.translate(`ivCalculator.leaderAppraisal.${teamKey}.individualShort`, language_code, [store[storeIndex].input.mon]);
 
         for (let i = 0; i < teamOptions.length; i++) {
             let position = Math.floor(i / 2);
             let keyboardOption = this.createKeyboardOptionSchema(teamOptions[i], this.stringifySelection("individualAppraisal", i));
-            
+
             if (orientationAppraisal === "sideBySide") {
                 if (i % 2 === 0) {
                     keyboardAnswers[position] = [];
@@ -285,7 +312,7 @@ class IVCalculatorCtrl {
                 keyboardAnswers.push([keyboardOption]);
             }
         }
-        
+
         return {
             //reply_to_message_id: msg.message_id,
             reply_markup: JSON.stringify({
@@ -305,18 +332,18 @@ class IVCalculatorCtrl {
         };
 
         const storeIndex = store.findIndex((item) => item.chat_id === msg.chat.id);
-        let texts = LocalizationHelper.translate(`ivCalculator.leaderAppraisal.${ store[storeIndex].team }.individual`, language_code, [store[storeIndex].input.mon]);
+        let texts = LocalizationHelper.translate(`ivCalculator.leaderAppraisal.${store[storeIndex].team}.individual`, language_code, [store[storeIndex].input.mon]);
         let text = texts[data.value];
         let resultText;
-        
+
         if (storeIndex > -1) {
-            store[storeIndex].individual = data.value;        
+            store[storeIndex].individual = data.value;
             debugStore();
         }
 
         if (data.action === "individualAppraisal") {
-            let calculations = FrameworkStats.calculate(store[storeIndex]);
-            resultText = LocalizationHelper.translate(`ivCalculator.result`, language_code, 
+            let calculations = Stats.calculate(store[storeIndex]);
+            resultText = LocalizationHelper.translate(`ivCalculator.result`, language_code,
                 [calculations.mon, calculations.IVs.ratio, calculations.IVs.statIVs.atk, calculations.IVs.statIVs.def, calculations.IVs.statIVs.sta]);
         }
 
